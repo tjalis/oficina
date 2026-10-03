@@ -17,7 +17,7 @@
     "appId": "br.com.oficinaar.app",
     "productName": "Oficina A.R",
     "directories": { "output": "dist" },
-    "files": ["main.js", "icon.png", "www/**/*"],
+    "files": ["main.js", "icon.png", "site.json", "www/**/*"],
     "win": { "target": ["nsis", "portable"], "icon": "icon.png" },
     "nsis": {
       "oneClick": true,

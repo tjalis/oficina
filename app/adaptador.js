@@ -224,19 +224,10 @@
   }
 
   // ---------- atualizações ----------
+  // O site, o .exe e o .apk abrem o app a partir do endereço publicado, então recebem
+  // as versões novas sozinhos. O service worker guarda a última versão para abrir sem internet.
   window.addEventListener('load', () => {
-    if (plat === 'web') {
-      if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
-      return;
-    }
-    if (!REPO || !VERSAO) return;
-    setTimeout(() => {
-      fetch(`https://api.github.com/repos/${REPO}/releases/latest`, { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(v => {
-        const nova = v && Number(String(v.tag_name || '').replace(/\D/g, ''));
-        if (!(nova > VERSAO)) return;
-        const arq = plat === 'pc' ? 'OficinaAR-Instalador.exe' : 'OficinaAR.apk';
-        aviso('Tem uma versão nova do app.', 12000, { rotulo: 'Baixar', fn: () => abrirFora(`https://github.com/${REPO}/releases/latest/download/${arq}`) });
-      }).catch(() => {});
-    }, 4000);
+    if ('serviceWorker' in navigator && location.protocol === 'https:' && location.hostname !== 'localhost')
+      navigator.serviceWorker.register('sw.js').catch(() => {});
   });
 })();
