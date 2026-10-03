@@ -1,0 +1,9 @@
+{
+  "appId": "br.com.oficinaar.app",
+  "appName": "Oficina A.R",
+  "webDir": "www",
+  "backgroundColor": "#F6F3F3",
+  "android": {
+    "adjustMarginsForEdgeToEdge": "auto"
+  }
+}

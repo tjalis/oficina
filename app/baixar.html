@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#C8102E">
+<title>Baixar · Oficina A.R</title>
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="vendor/fonts.css">
+<style>
+:root{--red:#C8102E;--ink:#1D1B1C;--mut:#6E6669;--line:#ECE4E6;--bg:#F6F3F3}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Barlow,system-ui,sans-serif}
+header{background:var(--red);color:#fff;padding:16px}
+header div{max-width:720px;margin:0 auto;display:flex;align-items:baseline;gap:8px}
+header b{font:800 30px/1 'Barlow Condensed',sans-serif}
+header span{font:600 14px 'Barlow Condensed',sans-serif;letter-spacing:.07em;text-transform:uppercase}
+main{max-width:720px;margin:0 auto;padding:20px 16px 40px;display:flex;flex-direction:column;gap:14px}
+h1{margin:0;font:700 26px 'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.03em}
+section{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px}
+h2{margin:0 0 6px;font:700 18px 'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.05em;color:var(--red)}
+p{margin:0 0 10px;color:var(--mut)}
+ol{margin:8px 0 0;padding-left:20px;color:var(--mut)}
+.bts{display:flex;flex-wrap:wrap;gap:8px}
+a.bt{display:inline-flex;align-items:center;min-height:46px;padding:0 18px;border-radius:10px;border:1.5px solid var(--red);color:var(--red);text-decoration:none;font-weight:600}
+a.bt.pri{background:var(--red);color:#fff}
+small{color:var(--mut)}
+</style>
+</head>
+<body>
+<header><div><b>A.R.</b><span>Oficina Mecânica</span></div></header>
+<main>
+  <h1>Instalar o app</h1>
+
+  <section>
+    <h2>Celular e tablet Android</h2>
+    <div class="bts"><a class="bt pri" href="https://github.com/{{REPO}}/releases/latest/download/OficinaAR.apk">Baixar o app (.apk)</a></div>
+    <ol>
+      <li>Toque em baixar e abra o arquivo quando terminar.</li>
+      <li>Se o Android pedir, permita instalar apps desta fonte (Chrome ou Arquivos).</li>
+      <li>Se o Play Protect avisar, toque em <b>Instalar mesmo assim</b>. O aviso aparece porque o app não vem da Play Store.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Computador (Windows)</h2>
+    <div class="bts">
+      <a class="bt pri" href="https://github.com/{{REPO}}/releases/latest/download/OficinaAR-Instalador.exe">Instalador (.exe)</a>
+      <a class="bt" href="https://github.com/{{REPO}}/releases/latest/download/OficinaAR-Portatil.exe">Versão sem instalar</a>
+    </div>
+    <ol>
+      <li>Abra o arquivo baixado. O instalador cria um atalho na área de trabalho.</li>
+      <li>Se aparecer "O Windows protegeu o computador", clique em <b>Mais informações</b> e depois em <b>Executar assim mesmo</b>.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Sem baixar nada</h2>
+    <p>O app também funciona direto pelo navegador e pode ser instalado por ele.</p>
+    <div class="bts"><a class="bt" href="./">Abrir o app</a></div>
+    <ol>
+      <li><b>Android (Chrome):</b> menu ⋮ → <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li>
+      <li><b>iPhone e iPad (Safari):</b> botão de compartilhar → <b>Adicionar à Tela de Início</b>.</li>
+      <li><b>Computador (Chrome ou Edge):</b> ícone de instalar na barra de endereço.</li>
+    </ol>
+  </section>
+
+  <small>Versão {{VERSAO}}</small>
+</main>
+</body>
+</html>

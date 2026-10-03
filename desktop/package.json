@@ -1,0 +1,32 @@
+{
+  "name": "oficina-ar-desktop",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Oficina A.R",
+  "author": "Oficina Mecânica A.R",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "br.com.oficinaar.app",
+    "productName": "Oficina A.R",
+    "directories": { "output": "dist" },
+    "files": ["main.js", "icon.png", "www/**/*"],
+    "win": { "target": ["nsis", "portable"], "icon": "icon.png" },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "Oficina A.R",
+      "artifactName": "OficinaAR-Instalador.exe"
+    },
+    "portable": { "artifactName": "OficinaAR-Portatil.exe" }
+  }
+}

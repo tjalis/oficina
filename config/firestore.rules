@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // só a conta da oficina lê e grava os registros
+    match /registros/{id} {
+      allow read, write: if request.auth != null
+                         && request.auth.token.email in ['EMAIL_DA_OFICINA'];
+    }
+  }
+}
