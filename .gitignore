@@ -1,0 +1,7 @@
+node_modules/
+www/
+desktop/www/
+desktop/dist/
+desktop/icon.png
+mobile/www/
+mobile/android/
