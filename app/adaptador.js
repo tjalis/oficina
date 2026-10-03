@@ -25,18 +25,18 @@
     html.app-final .view-toggle{display:none!important}
     html.app-final header.top{top:0;padding-top:env(safe-area-inset-top,0px)}
     html.app-final #sync{cursor:pointer}
-    .ar-login{position:fixed;inset:0;z-index:1000;background:#F6F3F3;display:flex;align-items:center;justify-content:center;padding:24px;font-family:Barlow,system-ui,sans-serif;color:#1D1B1C}
-    .ar-login form{width:100%;max-width:360px;background:#fff;border:1px solid #ECE4E6;border-radius:16px;padding:26px 22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 30px rgba(29,27,28,.08)}
-    .ar-login .marca{display:flex;align-items:baseline;gap:8px;justify-content:center;color:#C8102E;margin-bottom:4px}
+    .ar-login{position:fixed;inset:0;z-index:1000;background:var(--ground,#F6F3F3);display:flex;align-items:center;justify-content:center;padding:24px;font-family:Barlow,system-ui,sans-serif;color:var(--ink,#1D1B1C)}
+    .ar-login form{width:100%;max-width:360px;background:var(--bg,#fff);border:1px solid var(--line,#ECE4E6);border-radius:16px;padding:26px 22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 30px rgba(29,27,28,.08)}
+    .ar-login .marca{display:flex;align-items:baseline;gap:8px;justify-content:center;color:var(--red,#C8102E);margin-bottom:4px}
     .ar-login .marca b{font:800 40px/1 'Barlow Condensed',sans-serif}
     .ar-login .marca span{font:600 14px 'Barlow Condensed',sans-serif;letter-spacing:.07em;text-transform:uppercase}
-    .ar-login p{margin:0;text-align:center;color:#6E6669;font-size:14px}
-    .ar-login label{display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#6E6669}
-    .ar-login input{border:1.5px solid #ECE4E6;border-radius:10px;padding:12px;font:500 16px Barlow,system-ui,sans-serif;color:#1D1B1C;outline:none}
-    .ar-login input:focus{border-color:#C8102E}
-    .ar-login button{border:0;border-radius:10px;min-height:48px;background:#C8102E;color:#fff;font:600 16px Barlow,system-ui,sans-serif;cursor:pointer}
+    .ar-login p{margin:0;text-align:center;color:var(--muted,#6E6669);font-size:14px}
+    .ar-login label{display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#6E6669)}
+    .ar-login input{border:1.5px solid var(--line,#ECE4E6);background:var(--bg,#fff);border-radius:10px;padding:12px;font:500 16px Barlow,system-ui,sans-serif;color:var(--ink,#1D1B1C);outline:none}
+    .ar-login input:focus{border-color:var(--red,#C8102E)}
+    .ar-login button{border:0;border-radius:10px;min-height:48px;background:var(--red,#C8102E);color:#fff;font:600 16px Barlow,system-ui,sans-serif;cursor:pointer}
     .ar-login button[disabled]{opacity:.6}
-    .ar-login .erro{color:#C8102E;font-weight:600;min-height:1.2em}
+    .ar-login .erro{color:var(--red,#C8102E);font-weight:600;min-height:1.2em}
   `;
   document.head.appendChild(css);
 
@@ -92,16 +92,28 @@
       });
     });
     // tocar no indicador de sincronização mostra a conta e permite sair
+    // o último problema fica guardado para aparecer ao tocar no indicador
+    let ultimoErro = '';
+    const explicar = e => {
+      const c = (e && e.code) || '', m = (e && e.message) || '';
+      if (c === 'permission-denied') return 'O banco recusou esta conta (' + ((auth.currentUser && auth.currentUser.email) || '') + '). Confira as regras do Firestore: o e-mail precisa ser exatamente este, em minúsculas.';
+      if (c === 'not-found' || /does not exist|NOT_FOUND/i.test(m)) return 'O banco Firestore ainda não foi criado. No Firebase: Firestore Database → Criar banco de dados.';
+      if (c === 'failed-precondition' && /datastore/i.test(m)) return 'O banco foi criado no modo Datastore. Ele precisa estar no modo nativo do Firestore.';
+      if (c === 'unauthenticated') return 'O login expirou. Toque no indicador de sincronização, saia e entre de novo.';
+      if (c === 'unavailable') return '';
+      return 'Erro do banco: ' + (c || m || 'desconhecido');
+    };
+    const avisarErro = e => {
+      console.error('[Oficina A.R] banco:', e);
+      const t = explicar(e); if (!t) return;
+      ultimoErro = t; setTimeout(() => aviso(t, 12000), 80);
+    };
+    const semPermissao = e => { avisarErro(e); throw e; };
     const chip = document.getElementById('sync');
     if (chip) chip.addEventListener('click', () => {
       const u = auth.currentUser; if (!u) return;
-      aviso('Conectado como ' + u.email + '.', 6000, { rotulo: 'Sair', fn: () => auth.signOut().then(() => location.reload()) });
+      aviso('Conectado como ' + u.email + '.' + (ultimoErro ? ' ' + ultimoErro : ''), 12000, { rotulo: 'Sair', fn: () => auth.signOut().then(() => location.reload()) });
     });
-    const semPermissao = e => {
-      if (e && e.code === 'permission-denied')
-        setTimeout(() => aviso('O banco recusou o acesso desta conta. Confira as regras do Firestore.', 8000), 60);
-      throw e;
-    };
     return logado.then(() => ({
       collection(nome){
         const c = fs.collection(nome);
@@ -110,10 +122,36 @@
             const d = c.doc(id);
             return { set: v => d.set(v).catch(semPermissao), delete: () => d.delete().catch(semPermissao) };
           },
-          onSnapshot(cb, err){ return c.onSnapshot({ includeMetadataChanges: true }, cb, e => { try { semPermissao(e); } catch (_) {} if (err) err(e); }); }
+          onSnapshot(cb, err){
+            let doServidor = false;
+            // se em 12 s o banco não respondeu, descobre o motivo e avisa
+            const espera = setTimeout(() => { if (!doServidor) diagnosticar().then(m => { ultimoErro = m; aviso(m, 20000); }); }, 12000);
+            return c.onSnapshot({ includeMetadataChanges: true },
+              s => { if (!s.metadata.fromCache) { ultimoErro = ''; if (!doServidor) { doServidor = true; clearTimeout(espera); } } cb(s); },
+              e => { clearTimeout(espera); avisarErro(e); if (err) err(e); });
+          }
         };
       }
     }));
+
+    async function diagnosticar(){
+      if (!navigator.onLine) return 'Sem internet neste aparelho. Os registros ficam guardados aqui e sobem quando a internet voltar.';
+      try {
+        const tok = await auth.currentUser.getIdToken();
+        const r = await fetch(`https://firestore.googleapis.com/v1/projects/${cfg.projectId}/databases/(default)/documents/registros?pageSize=1`,
+          { headers: { Authorization: 'Bearer ' + tok } });
+        if (r.ok) return 'O banco responde, mas a conexão contínua está sendo bloqueada. Desative bloqueador de anúncios ou antivírus de navegação para este site e recarregue.';
+        const j = await r.json().catch(() => ({}));
+        const msg = (j.error && j.error.message) || '';
+        if (r.status === 404 || /does not exist|not found/i.test(msg)) return 'O banco ainda não foi criado. No Firebase: Firestore Database → Criar banco de dados.';
+        if (r.status === 403 && /disabled|has not been used|not been enabled/i.test(msg)) return 'O Firestore está desativado no projeto. No Firebase, abra Firestore Database e crie o banco.';
+        if (r.status === 403) return 'O banco recusou esta conta (' + auth.currentUser.email + '). Confira as regras do Firestore: o e-mail precisa ser exatamente este.';
+        if (r.status === 400 && /Datastore Mode/i.test(msg)) return 'O banco foi criado no modo Datastore. Ele precisa estar no modo nativo do Firestore.';
+        return 'O banco respondeu com erro ' + r.status + ': ' + msg;
+      } catch (_) {
+        return 'Não foi possível alcançar o banco. Pode ser a rede ou um bloqueador de anúncios.';
+      }
+    }
   }
 
   // ---------- salvar / compartilhar arquivos ----------
